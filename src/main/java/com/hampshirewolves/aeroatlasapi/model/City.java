@@ -44,9 +44,11 @@ public class City {
     private String iataCode;
 
     @Column(nullable = false, name = "star_rating")
+    @Enumerated(EnumType.STRING)
     private StarRating starRating;
 
     @Column(nullable = false, name = "price_rating")
+    @Enumerated(EnumType.STRING)
     private PriceRating priceRating;
 
     @Column(name = "created_at", updatable = false)
