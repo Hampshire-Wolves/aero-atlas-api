@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class CityServiceTest {
+public class CityServiceImplTest {
     @Mock
     private CityRepository mockCityRepository;
 
