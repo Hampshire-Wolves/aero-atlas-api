@@ -1,5 +1,6 @@
 package com.hampshirewolves.aeroatlasapi.service;
 
+import com.hampshirewolves.aeroatlasapi.exception.CityNotFoundException;
 import com.hampshirewolves.aeroatlasapi.model.City;
 import com.hampshirewolves.aeroatlasapi.repository.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +21,11 @@ public class CityServiceImpl implements CityService {
         cityRepository.findAll().forEach(cityList::add);
 
         return cityList;
+    }
+
+    @Override
+    public City getCityById(Long id) {
+        return cityRepository.findById(id)
+                .orElseThrow(() -> new CityNotFoundException(String.format("City with id '%s' could not be found", id)));
     }
 }
