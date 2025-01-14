@@ -1,10 +1,12 @@
 package com.hampshirewolves.aeroatlasapi.service;
 
 import com.hampshirewolves.aeroatlasapi.exception.CityNotFoundException;
+import com.hampshirewolves.aeroatlasapi.exception.MissingFieldException;
 import com.hampshirewolves.aeroatlasapi.model.City;
 import com.hampshirewolves.aeroatlasapi.model.PriceRating;
 import com.hampshirewolves.aeroatlasapi.model.StarRating;
 import com.hampshirewolves.aeroatlasapi.repository.CityRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,6 +28,24 @@ public class CityServiceImplTest {
 
     @InjectMocks
     private CityServiceImpl mockCityServiceImpl;
+
+    private City city;
+
+    @BeforeEach
+    public void setUp() {
+        city = City.builder()
+                .id(1L)
+                .name("London")
+                .description("test description")
+                .imageUrl("https://example.com/example.png")
+                .country("United Kingdom")
+                .lat(51.51)
+                .lng(0.12)
+                .iataCode("LON")
+                .starRating(StarRating.FOUR)
+                .priceRating(PriceRating.EXPENSIVE)
+                .build();
+    }
 
     @Test
     @DisplayName("getAllCities: should return all cities")
@@ -57,18 +77,8 @@ public class CityServiceImplTest {
     }
 
     @Test
-    @DisplayName("getCityById: should return city by a given id")
+    @DisplayName("getCityById: should return a City by a given id")
     public void testGetCityById() {
-        City city = City.builder()
-                .id(1L)
-                .name("London")
-                .description("test description")
-                .country("United Kingdom")
-                .iataCode("LON")
-                .starRating(StarRating.FOUR)
-                .priceRating(PriceRating.EXPENSIVE)
-                .build();
-
         when(mockCityRepository.findById(1L)).thenReturn(Optional.of(city));
 
         City actualResult = mockCityServiceImpl.getCityById(1L);
@@ -77,7 +87,10 @@ public class CityServiceImplTest {
         assertThat(actualResult).hasFieldOrPropertyWithValue("id", 1L);
         assertThat(actualResult).hasFieldOrPropertyWithValue("name", "London");
         assertThat(actualResult).hasFieldOrPropertyWithValue("description", "test description");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("imageUrl", "https://example.com/example.png");
         assertThat(actualResult).hasFieldOrPropertyWithValue("country", "United Kingdom");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("lat", 51.51);
+        assertThat(actualResult).hasFieldOrPropertyWithValue("lng", 0.12);
         assertThat(actualResult).hasFieldOrPropertyWithValue("iataCode", "LON");
         assertThat(actualResult).hasFieldOrPropertyWithValue("starRating", StarRating.FOUR);
         assertThat(actualResult).hasFieldOrPropertyWithValue("priceRating", PriceRating.EXPENSIVE);
@@ -86,12 +99,50 @@ public class CityServiceImplTest {
     }
 
     @Test
-    @DisplayName("getCityById: should throw CityNotFoundException when trying to find a city that does not exist")
+    @DisplayName("getCityById: should throw CityNotFoundException when trying to find a City that does not exist")
     public void testGetAlbumByIdThrowsWhenNotFound() {
         when(mockCityRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(CityNotFoundException.class, () -> mockCityServiceImpl.getCityById(1L));
 
         verify(mockCityRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName("addCity: should create then return a given City")
+    public void testAddCity() {
+        when(mockCityRepository.save(city)).thenReturn(city);
+
+        City actualResult = mockCityServiceImpl.addCity(city);
+
+        assertThat(actualResult).isNotNull();
+        assertThat(actualResult).hasFieldOrPropertyWithValue("id", 1L);
+        assertThat(actualResult).hasFieldOrPropertyWithValue("name", "London");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("description", "test description");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("imageUrl", "https://example.com/example.png");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("country", "United Kingdom");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("lat", 51.51);
+        assertThat(actualResult).hasFieldOrPropertyWithValue("lng", 0.12);
+        assertThat(actualResult).hasFieldOrPropertyWithValue("iataCode", "LON");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("starRating", StarRating.FOUR);
+        assertThat(actualResult).hasFieldOrPropertyWithValue("priceRating", PriceRating.EXPENSIVE);
+
+        verify(mockCityRepository, times(1)).save(city);
+    }
+
+    @Test
+    @DisplayName("addCity: should throw MissingFieldException when attempting to add a City with missing/null fields")
+    public void testAddCityThrowsException() {
+        City invalidCity = City.builder()
+                .name("INVALID")
+                .description("INVALID")
+                .build();
+
+        when(mockCityRepository.save(city)).thenReturn(city)
+                .thenThrow(new MissingFieldException("Missing field(s) in request body"));
+
+        assertThrows(MissingFieldException.class, () -> mockCityServiceImpl.addCity(invalidCity));
+
+        verify(mockCityRepository, never()).save(invalidCity);
     }
 }
