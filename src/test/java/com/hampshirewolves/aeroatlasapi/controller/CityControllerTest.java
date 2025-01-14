@@ -153,6 +153,15 @@ public class CityControllerTest {
                 .andExpect(jsonPath("$.priceRating").value(String.valueOf(PriceRating.EXPENSIVE)));
     }
 
+    @Test
+    @DisplayName("DELETE /cities/:id - should delete city")
+    public void testDeleteCityById() throws Exception {
+        doNothing().when(mockCityServiceImpl).deleteCityById(1L);
+
+        this.mockMvcController.perform(delete("/cities/1"))
+                .andExpect(status().isNoContent());
+    }
+
     private String toJSON(Object obj) {
         try {
             ObjectMapper mapper = new ObjectMapper();
