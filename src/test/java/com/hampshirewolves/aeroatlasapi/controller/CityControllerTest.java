@@ -110,4 +110,36 @@ public class CityControllerTest {
                 .andExpect(jsonPath("$.starRating").value(String.valueOf(StarRating.FOUR)))
                 .andExpect(jsonPath("$.priceRating").value(String.valueOf(PriceRating.EXPENSIVE)));
     }
+
+    @Test
+    @DisplayName("POST /cities - should persist & return new city")
+    public void testAddCity() throws Exception {
+        when(mockCityServiceImpl.addCity(city)).thenReturn(city);
+
+        this.mockMvcController.perform(post("/cities")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJSON(city)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("London"))
+                .andExpect(jsonPath("$.description").value("test description"))
+                .andExpect(jsonPath("$.imageUrl").value("https://example.com/example.png"))
+                .andExpect(jsonPath("$.country").value("United Kingdom"))
+                .andExpect(jsonPath("$.lat").value(51.51))
+                .andExpect(jsonPath("$.lng").value(0.12))
+                .andExpect(jsonPath("$.iataCode").value("LON"))
+                .andExpect(jsonPath("$.starRating").value(String.valueOf(StarRating.FOUR)))
+                .andExpect(jsonPath("$.priceRating").value(String.valueOf(PriceRating.EXPENSIVE)));
+    }
+
+    private String toJSON(Object obj) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+
+            return mapper.writer().withDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
