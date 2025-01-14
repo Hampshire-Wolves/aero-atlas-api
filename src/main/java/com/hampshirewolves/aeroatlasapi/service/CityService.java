@@ -7,4 +7,5 @@ import java.util.List;
 public interface CityService {
     List<City> getAllCities();
     City getCityById(Long id);
+    City addCity(City city);
 }
