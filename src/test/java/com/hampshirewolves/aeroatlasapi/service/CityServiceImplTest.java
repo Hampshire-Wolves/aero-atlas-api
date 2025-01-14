@@ -27,7 +27,7 @@ public class CityServiceImplTest {
     private CityRepository mockCityRepository;
 
     @InjectMocks
-    private CityServiceImpl mockCityServiceImpl;
+    private CityServiceImpl cityServiceImpl;
 
     private City city;
 
@@ -63,7 +63,7 @@ public class CityServiceImplTest {
 
         when(mockCityRepository.findAll()).thenReturn(cityList);
 
-        List<City> actualResult = mockCityServiceImpl.getAllCities();
+        List<City> actualResult = cityServiceImpl.getAllCities();
         City city1 = actualResult.getFirst();
         City city2 = actualResult.get(1);
         City city3 = actualResult.getLast();
@@ -81,7 +81,7 @@ public class CityServiceImplTest {
     public void testGetCityById() {
         when(mockCityRepository.findById(1L)).thenReturn(Optional.of(city));
 
-        City actualResult = mockCityServiceImpl.getCityById(1L);
+        City actualResult = cityServiceImpl.getCityById(1L);
 
         assertThat(actualResult).isNotNull();
         assertThat(actualResult).hasFieldOrPropertyWithValue("id", 1L);
@@ -100,10 +100,10 @@ public class CityServiceImplTest {
 
     @Test
     @DisplayName("getCityById: should throw CityNotFoundException when trying to find a City that does not exist")
-    public void testGetAlbumByIdThrowsWhenNotFound() {
+    public void testGetCityByIdThrowsCityNotFoundException() {
         when(mockCityRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(CityNotFoundException.class, () -> mockCityServiceImpl.getCityById(1L));
+        assertThrows(CityNotFoundException.class, () -> cityServiceImpl.getCityById(1L));
 
         verify(mockCityRepository, times(1)).findById(1L);
     }
@@ -113,7 +113,7 @@ public class CityServiceImplTest {
     public void testAddCity() {
         when(mockCityRepository.save(city)).thenReturn(city);
 
-        City actualResult = mockCityServiceImpl.addCity(city);
+        City actualResult = cityServiceImpl.addCity(city);
 
         assertThat(actualResult).isNotNull();
         assertThat(actualResult).hasFieldOrPropertyWithValue("id", 1L);
@@ -132,17 +132,65 @@ public class CityServiceImplTest {
 
     @Test
     @DisplayName("addCity: should throw MissingFieldException when attempting to add a City with missing/null fields")
-    public void testAddCityThrowsException() {
+    public void testAddCityThrowsMissingFieldException() {
         City invalidCity = City.builder()
                 .name("INVALID")
                 .description("INVALID")
                 .build();
 
-        when(mockCityRepository.save(city)).thenReturn(city)
-                .thenThrow(new MissingFieldException("Missing field(s) in request body"));
+        assertThrows(MissingFieldException.class, () -> cityServiceImpl.addCity(invalidCity));
 
-        assertThrows(MissingFieldException.class, () -> mockCityServiceImpl.addCity(invalidCity));
+        verify(mockCityRepository, never()).save(invalidCity);
+    }
 
+
+    @Test
+    @DisplayName("updateCityById: should update and return City")
+    public void testUpdateCityById() {
+        when(mockCityRepository.findById(1L)).thenReturn(Optional.of(city));
+        when(mockCityRepository.save(any(City.class))).thenReturn(city);
+
+        City actualResult = cityServiceImpl.updateCityById(1L, city);
+
+        assertThat(actualResult).isNotNull();
+        assertThat(actualResult).hasFieldOrPropertyWithValue("id", 1L);
+        assertThat(actualResult).hasFieldOrPropertyWithValue("name", "London");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("description", "test description");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("imageUrl", "https://example.com/example.png");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("country", "United Kingdom");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("lat", 51.51);
+        assertThat(actualResult).hasFieldOrPropertyWithValue("lng", 0.12);
+        assertThat(actualResult).hasFieldOrPropertyWithValue("iataCode", "LON");
+        assertThat(actualResult).hasFieldOrPropertyWithValue("starRating", StarRating.FOUR);
+        assertThat(actualResult).hasFieldOrPropertyWithValue("priceRating", PriceRating.EXPENSIVE);
+
+        verify(mockCityRepository, times(1)).findById(1L);
+        verify(mockCityRepository, times(1)).save(city);
+    }
+
+    @Test
+    @DisplayName("updateCityById: should throw CityNotFoundException when trying to find a City that does not exist")
+    public void testUpdateCityByIdThrowsCityNotFoundException() {
+        when(mockCityRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(CityNotFoundException.class, () -> cityServiceImpl.getCityById(1L));
+
+        verify(mockCityRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName("updateCityById: should throw MissingFieldException when attempting to update a City with missing/null fields")
+    public void testUpdateCityByIdThrowsMissingFieldException() {
+        when(mockCityRepository.findById(1L)).thenReturn(Optional.of(city));
+
+        City invalidCity = City.builder()
+            .name("INVALID")
+            .description("INVALID")
+            .build();
+
+        assertThrows(MissingFieldException.class, () -> cityServiceImpl.updateCityById(1L, invalidCity));
+
+        verify(mockCityRepository, times(1)).findById(1L);
         verify(mockCityRepository, never()).save(invalidCity);
     }
 }
