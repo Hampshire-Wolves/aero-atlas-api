@@ -193,4 +193,25 @@ public class CityServiceImplTest {
         verify(mockCityRepository, times(1)).findById(1L);
         verify(mockCityRepository, never()).save(invalidCity);
     }
+
+    @Test
+    @DisplayName("deleteCityById: should delete a given City")
+    public void testDeleteCityById() {
+        when(mockCityRepository.findById(1L)).thenReturn(Optional.of(city));
+
+        cityServiceImpl.deleteCityById(1L);
+
+        verify(mockCityRepository, times(1)).findById(1L);
+        verify(mockCityRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("deleteCityById: should throw CityNotFoundException when trying to find a City that does not exist")
+    public void testDeleteCityByIdThrowsCityNotFoundException() {
+        when(mockCityRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(CityNotFoundException.class, () -> cityServiceImpl.getCityById(1L));
+
+        verify(mockCityRepository, times(1)).findById(1L);
+    }
 }
