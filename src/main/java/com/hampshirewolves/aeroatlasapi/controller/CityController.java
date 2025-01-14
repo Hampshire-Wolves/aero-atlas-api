@@ -32,4 +32,9 @@ public class CityController {
     public ResponseEntity<City> addCity(@RequestBody City city) {
         return new ResponseEntity<>(cityService.addCity(city), HttpStatus.CREATED);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<City> updateCityById(@PathVariable Long id, @RequestBody City city) {
+        return new ResponseEntity<>(cityService.updateCityById(id, city), HttpStatus.OK);
+    }
 }
