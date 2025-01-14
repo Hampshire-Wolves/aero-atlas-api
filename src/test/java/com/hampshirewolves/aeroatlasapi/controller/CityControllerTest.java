@@ -91,4 +91,23 @@ public class CityControllerTest {
                 .andExpect(jsonPath("$[2].id").value(3))
                 .andExpect(jsonPath("$[2].name").value("Madrid"));
     }
+
+    @Test
+    @DisplayName("GET /cities/:id - should return specified city")
+    public void testGetCitiesById() throws Exception {
+        when(mockCityServiceImpl.getCityById(1L)).thenReturn(city);
+
+        this.mockMvcController.perform(get("/cities/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("London"))
+                .andExpect(jsonPath("$.description").value("test description"))
+                .andExpect(jsonPath("$.imageUrl").value("https://example.com/example.png"))
+                .andExpect(jsonPath("$.country").value("United Kingdom"))
+                .andExpect(jsonPath("$.lat").value(51.51))
+                .andExpect(jsonPath("$.lng").value(0.12))
+                .andExpect(jsonPath("$.iataCode").value("LON"))
+                .andExpect(jsonPath("$.starRating").value(String.valueOf(StarRating.FOUR)))
+                .andExpect(jsonPath("$.priceRating").value(String.valueOf(PriceRating.EXPENSIVE)));
+    }
 }
