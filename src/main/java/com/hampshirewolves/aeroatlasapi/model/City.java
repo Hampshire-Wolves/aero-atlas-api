@@ -35,10 +35,10 @@ public class City {
     private String country;
 
     @Column(nullable = false)
-    private String lat;
+    private Double lat;
 
     @Column(nullable = false)
-    private String lng;
+    private Double lng;
 
     @Column(nullable = false)
     private String iataCode;
