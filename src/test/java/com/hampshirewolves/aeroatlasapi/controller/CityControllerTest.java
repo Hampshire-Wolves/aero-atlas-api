@@ -132,6 +132,27 @@ public class CityControllerTest {
                 .andExpect(jsonPath("$.priceRating").value(String.valueOf(PriceRating.EXPENSIVE)));
     }
 
+    @Test
+    @DisplayName("PUT /cities/:id - should return updated city")
+    public void testUpdateCityById() throws Exception {
+        when(mockCityServiceImpl.updateCityById(eq(1L), any(City.class))).thenReturn(city);
+
+        this.mockMvcController.perform(put("/cities/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJSON(city)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("London"))
+                .andExpect(jsonPath("$.description").value("test description"))
+                .andExpect(jsonPath("$.imageUrl").value("https://example.com/example.png"))
+                .andExpect(jsonPath("$.country").value("United Kingdom"))
+                .andExpect(jsonPath("$.lat").value(51.51))
+                .andExpect(jsonPath("$.lng").value(0.12))
+                .andExpect(jsonPath("$.iataCode").value("LON"))
+                .andExpect(jsonPath("$.starRating").value(String.valueOf(StarRating.FOUR)))
+                .andExpect(jsonPath("$.priceRating").value(String.valueOf(PriceRating.EXPENSIVE)));
+    }
+
     private String toJSON(Object obj) {
         try {
             ObjectMapper mapper = new ObjectMapper();
