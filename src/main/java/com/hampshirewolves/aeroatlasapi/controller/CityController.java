@@ -37,4 +37,11 @@ public class CityController {
     public ResponseEntity<City> updateCityById(@PathVariable Long id, @RequestBody City city) {
         return new ResponseEntity<>(cityService.updateCityById(id, city), HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCityById(@PathVariable Long id) {
+        cityService.deleteCityById(id);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
