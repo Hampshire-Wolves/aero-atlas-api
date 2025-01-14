@@ -22,4 +22,9 @@ public class CityController {
 
         return new ResponseEntity<>(albums, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<City> getCityById(@PathVariable Long id) {
+        return new ResponseEntity<>(cityService.getCityById(id), HttpStatus.OK);
+    }
 }
