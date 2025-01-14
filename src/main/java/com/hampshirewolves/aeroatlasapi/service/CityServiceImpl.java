@@ -75,14 +75,10 @@ public class CityServiceImpl implements CityService {
     }
 
     private boolean requestBodyHasValidFields(City city) {
-        if (city.getName() == null || city.getDescription() == null
-                || city.getImageUrl() == null || city.getCountry() == null
-                || city.getLat() == null || city.getLng() == null
-                || city.getIataCode() == null || city.getStarRating() == null
-        || city.getPriceRating() == null) {
-            return false;
-        }
-
-        return true;
+        return city.getName() != null && city.getDescription() != null
+                && city.getImageUrl() != null && city.getCountry() != null
+                && city.getLat() != null && city.getLng() != null
+                && city.getIataCode() != null && city.getStarRating() != null
+                && city.getPriceRating() != null;
     }
 }
