@@ -27,4 +27,9 @@ public class CityController {
     public ResponseEntity<City> getCityById(@PathVariable Long id) {
         return new ResponseEntity<>(cityService.getCityById(id), HttpStatus.OK);
     }
+
+    @PostMapping
+    public ResponseEntity<City> addCity(@RequestBody City city) {
+        return new ResponseEntity<>(cityService.addCity(city), HttpStatus.CREATED);
+    }
 }
