@@ -65,6 +65,15 @@ public class CityServiceImpl implements CityService {
         return cityRepository.save(foundCity);
     }
 
+    @Override
+    public void deleteCityById(Long id) {
+        cityRepository.findById(id)
+                .orElseThrow(() -> new CityNotFoundException(String.format("City with id '%s' could not be found", id)));
+
+
+        cityRepository.deleteById(id);
+    }
+
     private boolean requestBodyHasValidFields(City city) {
         if (city.getName() == null || city.getDescription() == null
                 || city.getImageUrl() == null || city.getCountry() == null
