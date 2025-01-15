@@ -1,6 +1,7 @@
 package com.hampshirewolves.aeroatlasapi.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -33,6 +35,10 @@ public class City {
 
     @Column(nullable = false)
     private String country;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Attraction> attractions;
 
     @Column(nullable = false)
     private Double lat;
