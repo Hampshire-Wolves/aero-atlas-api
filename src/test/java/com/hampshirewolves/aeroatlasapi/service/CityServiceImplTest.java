@@ -194,6 +194,7 @@ public class CityServiceImplTest {
     @DisplayName("updateCityById: should update and return City")
     public void testUpdateCityById() {
         when(mockCityRepository.findById(1L)).thenReturn(Optional.of(city));
+        when(mockAttractionRepository.findById(1L)).thenReturn(Optional.of(attraction));
         when(mockCityRepository.save(any(City.class))).thenReturn(city);
         when(mockAttractionRepository.save(any(Attraction.class))).thenReturn(attraction);
 
