@@ -1,7 +1,7 @@
 package com.hampshirewolves.aeroatlasapi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,15 +11,14 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "cities")
+@Table(name = "attractions")
 @Entity
-public class City {
+public class Attraction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,35 +26,13 @@ public class City {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String description;
-
     @Column(nullable = false, name = "image_url")
     private String imageUrl;
 
-    @Column(nullable = false)
-    private String country;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "city", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Attraction> attractions;
-
-    @Column(nullable = false)
-    private Double lat;
-
-    @Column(nullable = false)
-    private Double lng;
-
-    @Column(nullable = false)
-    private String iataCode;
-
-    @Column(nullable = false, name = "star_rating")
-    @Enumerated(EnumType.STRING)
-    private StarRating starRating;
-
-    @Column(nullable = false, name = "price_rating")
-    @Enumerated(EnumType.STRING)
-    private PriceRating priceRating;
+    @ManyToOne
+    @JoinColumn(name = "city_id", nullable = false)
+    @JsonBackReference
+    private City city;
 
     @Column(name = "created_at", updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")

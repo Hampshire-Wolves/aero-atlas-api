@@ -3,6 +3,9 @@ package com.hampshirewolves.aeroatlasapi.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.hampshirewolves.aeroatlasapi.dto.AttractionDTO;
+import com.hampshirewolves.aeroatlasapi.dto.CityDTO;
+import com.hampshirewolves.aeroatlasapi.model.Attraction;
 import com.hampshirewolves.aeroatlasapi.model.City;
 import com.hampshirewolves.aeroatlasapi.model.PriceRating;
 import com.hampshirewolves.aeroatlasapi.model.StarRating;
@@ -44,16 +47,47 @@ public class CityControllerTest {
     private MockMvc mockMvcController;
 
     private City city;
+    private Attraction attraction;
+    private CityDTO cityDTO;
+    private AttractionDTO attractionDTO;
 
     @BeforeEach
     public void setup() {
         mockMvcController = MockMvcBuilders.standaloneSetup(cityController).build();
+
+        attraction = Attraction.builder()
+                .id(1L)
+                .name("Big Ben")
+                .imageUrl("https://example.com/example.png")
+                .city(city)
+                .build();
+
+        attractionDTO = AttractionDTO.builder()
+                .id(1L)
+                .name("Big Ben")
+                .imageUrl("https://example.com/example.png")
+                .build();
 
         city = City.builder()
                 .id(1L)
                 .name("London")
                 .description("test description")
                 .imageUrl("https://example.com/example.png")
+                .attractions(List.of(attraction))
+                .country("United Kingdom")
+                .lat(51.51)
+                .lng(0.12)
+                .iataCode("LON")
+                .starRating(StarRating.FOUR)
+                .priceRating(PriceRating.EXPENSIVE)
+                .build();
+
+        cityDTO = CityDTO.builder()
+                .id(1L)
+                .name("London")
+                .description("test description")
+                .imageUrl("https://example.com/example.png")
+                .attractions(List.of(attractionDTO))
                 .country("United Kingdom")
                 .lat(51.51)
                 .lng(0.12)
@@ -66,16 +100,16 @@ public class CityControllerTest {
     @Test
     @DisplayName("GET /cities - returns all cities")
     public void testGetAllCities() throws Exception {
-        List<City> cityList = new ArrayList<>();
-        cityList.add(City.builder()
+        List<CityDTO> cityList = new ArrayList<>();
+        cityList.add(CityDTO.builder()
                 .id(1L)
                 .name("London")
                 .build());
-        cityList.add(City.builder()
+        cityList.add(CityDTO.builder()
                 .id(2L)
                 .name("Berlin")
                 .build());
-        cityList.add(City.builder()
+        cityList.add(CityDTO.builder()
                 .id(3L)
                 .name("Madrid")
                 .build());
@@ -95,7 +129,7 @@ public class CityControllerTest {
     @Test
     @DisplayName("GET /cities/:id - should return specified city")
     public void testGetCitiesById() throws Exception {
-        when(mockCityServiceImpl.getCityById(1L)).thenReturn(city);
+        when(mockCityServiceImpl.getCityById(1L)).thenReturn(cityDTO);
 
         this.mockMvcController.perform(get("/cities/1"))
                 .andExpect(status().isOk())
@@ -114,7 +148,7 @@ public class CityControllerTest {
     @Test
     @DisplayName("POST /cities - should persist & return new city")
     public void testAddCity() throws Exception {
-        when(mockCityServiceImpl.addCity(city)).thenReturn(city);
+        when(mockCityServiceImpl.addCity(cityDTO)).thenReturn(cityDTO);
 
         this.mockMvcController.perform(post("/cities")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -135,7 +169,7 @@ public class CityControllerTest {
     @Test
     @DisplayName("PUT /cities/:id - should return updated city")
     public void testUpdateCityById() throws Exception {
-        when(mockCityServiceImpl.updateCityById(eq(1L), any(City.class))).thenReturn(city);
+        when(mockCityServiceImpl.updateCityById(eq(1L), any(CityDTO.class))).thenReturn(cityDTO);
 
         this.mockMvcController.perform(put("/cities/1")
                         .contentType(MediaType.APPLICATION_JSON)

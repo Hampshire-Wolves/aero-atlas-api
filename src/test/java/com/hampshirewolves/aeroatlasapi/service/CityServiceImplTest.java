@@ -1,10 +1,14 @@
 package com.hampshirewolves.aeroatlasapi.service;
 
+import com.hampshirewolves.aeroatlasapi.dto.AttractionDTO;
+import com.hampshirewolves.aeroatlasapi.dto.CityDTO;
 import com.hampshirewolves.aeroatlasapi.exception.CityNotFoundException;
 import com.hampshirewolves.aeroatlasapi.exception.MissingFieldException;
+import com.hampshirewolves.aeroatlasapi.model.Attraction;
 import com.hampshirewolves.aeroatlasapi.model.City;
 import com.hampshirewolves.aeroatlasapi.model.PriceRating;
 import com.hampshirewolves.aeroatlasapi.model.StarRating;
+import com.hampshirewolves.aeroatlasapi.repository.AttractionRepository;
 import com.hampshirewolves.aeroatlasapi.repository.CityRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,10 +30,16 @@ public class CityServiceImplTest {
     @Mock
     private CityRepository mockCityRepository;
 
+    @Mock
+    private AttractionRepository mockAttractionRepository;
+
     @InjectMocks
     private CityServiceImpl cityServiceImpl;
 
     private City city;
+    private Attraction attraction;
+    private CityDTO cityDTO;
+    private AttractionDTO attractionDTO;
 
     @BeforeEach
     public void setUp() {
@@ -45,6 +55,35 @@ public class CityServiceImplTest {
                 .starRating(StarRating.FOUR)
                 .priceRating(PriceRating.EXPENSIVE)
                 .build();
+
+        attraction = Attraction.builder()
+                .id(1L)
+                .name("Big Ben")
+                .imageUrl("https://example.com/example.png")
+                .city(city)
+                .build();
+
+        attractionDTO = AttractionDTO.builder()
+            .id(1L)
+            .name("Big Ben")
+            .imageUrl("https://example.com/example.png")
+            .build();
+
+        cityDTO = CityDTO.builder()
+                .id(1L)
+                .name("London")
+                .description("test description")
+                .imageUrl("https://example.com/example.png")
+                .attractions(List.of(attractionDTO))
+                .country("United Kingdom")
+                .lat(51.51)
+                .lng(0.12)
+                .iataCode("LON")
+                .starRating(StarRating.FOUR)
+                .priceRating(PriceRating.EXPENSIVE)
+                .build();
+
+        city.setAttractions(List.of(attraction));
     }
 
     @Test
@@ -63,10 +102,10 @@ public class CityServiceImplTest {
 
         when(mockCityRepository.findAll()).thenReturn(cityList);
 
-        List<City> actualResult = cityServiceImpl.getAllCities();
-        City city1 = actualResult.getFirst();
-        City city2 = actualResult.get(1);
-        City city3 = actualResult.getLast();
+        var actualResult = cityServiceImpl.getAllCities();
+        var city1 = actualResult.getFirst();
+        var city2 = actualResult.get(1);
+        var city3 = actualResult.getLast();
 
         assertThat(actualResult).hasSize(3);
         assertThat(city1).hasFieldOrPropertyWithValue("name", "London");
@@ -81,7 +120,7 @@ public class CityServiceImplTest {
     public void testGetCityById() {
         when(mockCityRepository.findById(1L)).thenReturn(Optional.of(city));
 
-        City actualResult = cityServiceImpl.getCityById(1L);
+        var actualResult = cityServiceImpl.getCityById(1L);
 
         assertThat(actualResult).isNotNull();
         assertThat(actualResult).hasFieldOrPropertyWithValue("id", 1L);
@@ -111,9 +150,10 @@ public class CityServiceImplTest {
     @Test
     @DisplayName("addCity: should create then return a given City")
     public void testAddCity() {
-        when(mockCityRepository.save(city)).thenReturn(city);
+        when(mockCityRepository.save(any(City.class))).thenReturn(city);
+        when(mockAttractionRepository.save(any(Attraction.class))).thenReturn(attraction);
 
-        City actualResult = cityServiceImpl.addCity(city);
+        var actualResult = cityServiceImpl.addCity(cityDTO);
 
         assertThat(actualResult).isNotNull();
         assertThat(actualResult).hasFieldOrPropertyWithValue("id", 1L);
@@ -128,17 +168,23 @@ public class CityServiceImplTest {
         assertThat(actualResult).hasFieldOrPropertyWithValue("priceRating", PriceRating.EXPENSIVE);
 
         verify(mockCityRepository, times(1)).save(city);
+        verify(mockAttractionRepository, times(1)).save(attraction);
     }
 
     @Test
     @DisplayName("addCity: should throw MissingFieldException when attempting to add a City with missing/null fields")
     public void testAddCityThrowsMissingFieldException() {
-        City invalidCity = City.builder()
+        var invalidCity = City.builder()
                 .name("INVALID")
                 .description("INVALID")
                 .build();
 
-        assertThrows(MissingFieldException.class, () -> cityServiceImpl.addCity(invalidCity));
+        var invalidCityDTO = CityDTO.builder()
+                .name("INVALID")
+                .description("INVALID")
+                .build();
+
+        assertThrows(MissingFieldException.class, () -> cityServiceImpl.addCity(invalidCityDTO));
 
         verify(mockCityRepository, never()).save(invalidCity);
     }
@@ -148,9 +194,11 @@ public class CityServiceImplTest {
     @DisplayName("updateCityById: should update and return City")
     public void testUpdateCityById() {
         when(mockCityRepository.findById(1L)).thenReturn(Optional.of(city));
+        when(mockAttractionRepository.findById(1L)).thenReturn(Optional.of(attraction));
         when(mockCityRepository.save(any(City.class))).thenReturn(city);
+        when(mockAttractionRepository.save(any(Attraction.class))).thenReturn(attraction);
 
-        City actualResult = cityServiceImpl.updateCityById(1L, city);
+        var actualResult = cityServiceImpl.updateCityById(1L, cityDTO);
 
         assertThat(actualResult).isNotNull();
         assertThat(actualResult).hasFieldOrPropertyWithValue("id", 1L);
@@ -166,6 +214,7 @@ public class CityServiceImplTest {
 
         verify(mockCityRepository, times(1)).findById(1L);
         verify(mockCityRepository, times(1)).save(city);
+        verify(mockAttractionRepository, times(1)).save(attraction);
     }
 
     @Test
@@ -183,12 +232,17 @@ public class CityServiceImplTest {
     public void testUpdateCityByIdThrowsMissingFieldException() {
         when(mockCityRepository.findById(1L)).thenReturn(Optional.of(city));
 
-        City invalidCity = City.builder()
-            .name("INVALID")
-            .description("INVALID")
-            .build();
+        var invalidCity = City.builder()
+                .name("INVALID")
+                .description("INVALID")
+                .build();
 
-        assertThrows(MissingFieldException.class, () -> cityServiceImpl.updateCityById(1L, invalidCity));
+        var invalidCityDTO = CityDTO.builder()
+                .name("INVALID")
+                .description("INVALID")
+                .build();
+
+        assertThrows(MissingFieldException.class, () -> cityServiceImpl.updateCityById(1L, invalidCityDTO));
 
         verify(mockCityRepository, times(1)).findById(1L);
         verify(mockCityRepository, never()).save(invalidCity);
@@ -213,5 +267,63 @@ public class CityServiceImplTest {
         assertThrows(CityNotFoundException.class, () -> cityServiceImpl.getCityById(1L));
 
         verify(mockCityRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName("mapToDTO(City): should return city as a DTO")
+    public void testMapToDTOReturnsCityDTO() {
+        var result = cityServiceImpl.mapToDTO(city);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasFieldOrPropertyWithValue("id", 1L);
+        assertThat(result).hasFieldOrPropertyWithValue("name", "London");
+        assertThat(result).hasFieldOrPropertyWithValue("description", "test description");
+        assertThat(result).hasFieldOrPropertyWithValue("imageUrl", "https://example.com/example.png");
+        assertThat(result).hasFieldOrPropertyWithValue("country", "United Kingdom");
+        assertThat(result).hasFieldOrPropertyWithValue("lat", 51.51);
+        assertThat(result).hasFieldOrPropertyWithValue("lng", 0.12);
+        assertThat(result).hasFieldOrPropertyWithValue("iataCode", "LON");
+        assertThat(result).hasFieldOrPropertyWithValue("starRating", StarRating.FOUR);
+        assertThat(result).hasFieldOrPropertyWithValue("priceRating", PriceRating.EXPENSIVE);
+    }
+
+    @Test
+    @DisplayName("mapToEntity(CityDTO): should return DTO as a city")
+    public void testMapToEntityReturnsCity() {
+        var result = cityServiceImpl.mapToEntity(cityDTO);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasFieldOrPropertyWithValue("id", 1L);
+        assertThat(result).hasFieldOrPropertyWithValue("name", "London");
+        assertThat(result).hasFieldOrPropertyWithValue("description", "test description");
+        assertThat(result).hasFieldOrPropertyWithValue("imageUrl", "https://example.com/example.png");
+        assertThat(result).hasFieldOrPropertyWithValue("country", "United Kingdom");
+        assertThat(result).hasFieldOrPropertyWithValue("lat", 51.51);
+        assertThat(result).hasFieldOrPropertyWithValue("lng", 0.12);
+        assertThat(result).hasFieldOrPropertyWithValue("iataCode", "LON");
+        assertThat(result).hasFieldOrPropertyWithValue("starRating", StarRating.FOUR);
+        assertThat(result).hasFieldOrPropertyWithValue("priceRating", PriceRating.EXPENSIVE);
+    }
+
+    @Test
+    @DisplayName("mapToDTO(Attraction): should return attraction as a DTO")
+    public void testMapToDTOReturnsAttractionDTO() {
+        var result = cityServiceImpl.mapToDTO(attraction);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasFieldOrPropertyWithValue("id", 1L);
+        assertThat(result).hasFieldOrPropertyWithValue("name", "Big Ben");
+        assertThat(result).hasFieldOrPropertyWithValue("imageUrl", "https://example.com/example.png");
+    }
+
+    @Test
+    @DisplayName("mapToEntity(AttractionDTO): should return DTO as an attraction")
+    public void testMapToEntityReturnsAttraction() {
+        var result = cityServiceImpl.mapToEntity(attractionDTO);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasFieldOrPropertyWithValue("id", 1L);
+        assertThat(result).hasFieldOrPropertyWithValue("name", "Big Ben");
+        assertThat(result).hasFieldOrPropertyWithValue("imageUrl", "https://example.com/example.png");
     }
 }

@@ -9,7 +9,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler
-    public ResponseEntity<Object> handleItemNotFoundException(CityNotFoundException e) {
+    public ResponseEntity<Object> handleCityNotFoundException(CityNotFoundException e) {
+        return new ResponseEntity<>(new ErrorResponse(404, e.getMessage()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleAttractionNotFoundException(AttractionNotFoundException e) {
         return new ResponseEntity<>(new ErrorResponse(404, e.getMessage()), HttpStatus.NOT_FOUND);
     }
 

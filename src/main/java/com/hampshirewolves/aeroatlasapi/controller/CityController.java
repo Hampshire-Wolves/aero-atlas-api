@@ -1,6 +1,6 @@
 package com.hampshirewolves.aeroatlasapi.controller;
 
-import com.hampshirewolves.aeroatlasapi.model.City;
+import com.hampshirewolves.aeroatlasapi.dto.CityDTO;
 import com.hampshirewolves.aeroatlasapi.service.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,29 +17,29 @@ public class CityController {
     private CityService cityService;
 
     @GetMapping
-    public ResponseEntity<List<City>> getAllCities() {
-        List<City> albums = cityService.getAllCities();
+    public ResponseEntity<List<CityDTO>> getAllCities() {
+        List<CityDTO> albums = cityService.getAllCities();
 
         return new ResponseEntity<>(albums, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<City> getCityById(@PathVariable Long id) {
+    public ResponseEntity<CityDTO> getCityById(@PathVariable Long id) {
         return new ResponseEntity<>(cityService.getCityById(id), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<City> addCity(@RequestBody City city) {
+    public ResponseEntity<CityDTO> addCity(@RequestBody CityDTO city) {
         return new ResponseEntity<>(cityService.addCity(city), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<City> updateCityById(@PathVariable Long id, @RequestBody City city) {
-        return new ResponseEntity<>(cityService.updateCityById(id, city), HttpStatus.OK);
+    public ResponseEntity<CityDTO> updateCityById(@PathVariable Long id, @RequestBody CityDTO cityDTO) {
+        return new ResponseEntity<>(cityService.updateCityById(id, cityDTO), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCityById(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCityById(@PathVariable Long id) {
         cityService.deleteCityById(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
