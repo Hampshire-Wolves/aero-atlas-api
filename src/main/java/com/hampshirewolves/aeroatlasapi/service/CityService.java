@@ -1,13 +1,13 @@
 package com.hampshirewolves.aeroatlasapi.service;
 
-import com.hampshirewolves.aeroatlasapi.model.City;
+import com.hampshirewolves.aeroatlasapi.dto.CityDTO;
 
 import java.util.List;
 
 public interface CityService {
-    List<City> getAllCities();
-    City getCityById(Long id);
-    City addCity(City city);
-    City updateCityById(Long id, City city);
+    List<CityDTO> getAllCities();
+    CityDTO getCityById(Long id);
+    CityDTO addCity(CityDTO city);
+    CityDTO updateCityById(Long id, CityDTO city);
     void deleteCityById(Long id);
 }
