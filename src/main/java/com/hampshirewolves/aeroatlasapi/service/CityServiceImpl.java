@@ -2,6 +2,7 @@ package com.hampshirewolves.aeroatlasapi.service;
 
 import com.hampshirewolves.aeroatlasapi.dto.AttractionDTO;
 import com.hampshirewolves.aeroatlasapi.dto.CityDTO;
+import com.hampshirewolves.aeroatlasapi.exception.AttractionNotFoundException;
 import com.hampshirewolves.aeroatlasapi.exception.CityNotFoundException;
 import com.hampshirewolves.aeroatlasapi.exception.MissingFieldException;
 import com.hampshirewolves.aeroatlasapi.model.Attraction;
@@ -101,9 +102,15 @@ public class CityServiceImpl implements CityService {
 
             List<Attraction> updatedAttractions = cityDTO.getAttractions().stream()
                     .map(attractionDTO -> {
-                        Attraction attraction = mapToEntity(attractionDTO);
-                        attraction.setCity(foundCity);
-                        return attractionRepository.save(attraction);
+                        Attraction foundAttraction = attractionRepository.findById(attractionDTO.getId())
+                                .orElseThrow(() -> new AttractionNotFoundException(String.format("Attraction with id '%s' could not be found", attractionDTO.getId())));
+
+                        foundAttraction.setId(attractionDTO.getId());
+                        foundAttraction.setName(attractionDTO.getName());
+                        foundAttraction.setImageUrl(attractionDTO.getImageUrl());
+                        foundAttraction.setCity(foundCity);
+
+                        return attractionRepository.save(foundAttraction);
                     })
                     .collect(Collectors.toList());
 
