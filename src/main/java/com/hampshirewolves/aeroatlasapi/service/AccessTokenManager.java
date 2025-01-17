@@ -1,9 +1,11 @@
 package com.hampshirewolves.aeroatlasapi.service;
 
-import org.example.dto.AccessTokenResponse;
+import com.hampshirewolves.aeroatlasapi.dto.AccessTokenResponse;
 import org.springframework.http.*;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+@Service
 public class AccessTokenManager {
 
     private AccessTokenResponse currentAccessTokenResponse;

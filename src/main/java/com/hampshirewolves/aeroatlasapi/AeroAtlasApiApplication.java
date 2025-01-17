@@ -1,5 +1,6 @@
 package com.hampshirewolves.aeroatlasapi;
 
+import com.hampshirewolves.aeroatlasapi.dto.FlightSegmentDTO;
 import com.hampshirewolves.aeroatlasapi.service.AccessTokenManager;
 import com.hampshirewolves.aeroatlasapi.service.FlightDetailsService;
 import com.hampshirewolves.aeroatlasapi.service.FlightFetcher;
@@ -31,7 +32,7 @@ public class AeroAtlasApiApplication {
 			if (accessToken != null) {
 				String jsonResponse = flightFetcher.fetchFlightOffers(accessToken, flightOfferUrl);
 				if (jsonResponse != null) {
-					List<org.example.dto.FlightSegmentDTO> flightDetails = flightDetailsService.extractFlightDetails(jsonResponse);
+					List<FlightSegmentDTO> flightDetails = flightDetailsService.extractFlightDetails(jsonResponse);
 
 					// Convert flightDetails to JSON for printing to the console
 					ObjectMapper objectMapper = new ObjectMapper();

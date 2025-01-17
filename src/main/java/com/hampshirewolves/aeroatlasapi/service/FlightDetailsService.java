@@ -2,7 +2,7 @@ package com.hampshirewolves.aeroatlasapi.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.dto.FlightSegmentDTO;
+import com.hampshirewolves.aeroatlasapi.dto.FlightSegmentDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

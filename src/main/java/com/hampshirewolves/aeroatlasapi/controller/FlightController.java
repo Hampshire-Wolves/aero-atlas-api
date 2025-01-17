@@ -1,32 +1,36 @@
 package com.hampshirewolves.aeroatlasapi.controller;
 
-import com.hampshirewolves.aeroatlasapi.service.FlightDetailsService;
+import com.hampshirewolves.aeroatlasapi.dto.Flight;
+import com.hampshirewolves.aeroatlasapi.dto.FlightSegmentDTO;
+import com.hampshirewolves.aeroatlasapi.service.FlightService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
+@RequestMapping("/flights")
+@RequiredArgsConstructor
 public class FlightController {
 
-    private final FlightDetailsService flightDetailsService;
+    @GetMapping
+    public List<Flight> getFlights() {
+        // Example hardcoded flights
+        Flight flight1 = new Flight("One Way", "LHR", "MAD",
+                "2025-01-28T09:15:00", "2025-01-28T12:40:00",
+                "IB", "712", 153.21, 91.0);
 
-    public FlightController(FlightDetailsService flightDetailsService) {
-        this.flightDetailsService = flightDetailsService;
+        Flight flight2 = new Flight("Return", "MAD", "LHR",
+                "2025-02-10T20:40:00", "2025-02-10T21:55:00",
+                "IB", "3650", 153.21, 91.0);
+
+        return Arrays.asList(flight1, flight2);
     }
-
-    @GetMapping("/flights/details")
-    public ResponseEntity<List<org.example.dto.FlightSegmentDTO>> getFlightDetails(@RequestParam String jsonResponse) {
-        System.out.println("Received JSON Response: " + jsonResponse); // Debug output
-        try {
-            List<org.example.dto.FlightSegmentDTO> flightDetails = flightDetailsService.extractFlightDetails(jsonResponse);
-            return ResponseEntity.ok(flightDetails);
-        } catch (Exception e) {
-            System.err.println("Error extracting flight details: " + e.getMessage());
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
 }
+
+
+
+

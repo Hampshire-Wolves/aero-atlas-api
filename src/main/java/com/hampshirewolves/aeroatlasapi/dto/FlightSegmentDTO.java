@@ -1,4 +1,4 @@
-package org.example.dto;
+package com.hampshirewolves.aeroatlasapi.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
