@@ -1,36 +1,26 @@
 package com.hampshirewolves.aeroatlasapi.controller;
 
-import com.hampshirewolves.aeroatlasapi.dto.Flight;
-import com.hampshirewolves.aeroatlasapi.dto.FlightSegmentDTO;
-import com.hampshirewolves.aeroatlasapi.service.FlightService;
+import com.hampshirewolves.aeroatlasapi.service.FlightDataStore;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/flights")
 @RequiredArgsConstructor
 public class FlightController {
 
+    private final FlightDataStore flightDataStore;
+
     @GetMapping
-    public List<Flight> getFlights() {
-        // Example hardcoded flights
-        Flight flight1 = new Flight("One Way", "LHR", "MAD",
-                "2025-01-28T09:15:00", "2025-01-28T12:40:00",
-                "IB", "712", 153.21, 91.0);
-
-        Flight flight2 = new Flight("Return", "MAD", "LHR",
-                "2025-02-10T20:40:00", "2025-02-10T21:55:00",
-                "IB", "3650", 153.21, 91.0);
-
-        return Arrays.asList(flight1, flight2);
+    public ResponseEntity<String> getFlights() {
+        String flightDataJson = flightDataStore.getFlightDataJson();
+        if (flightDataJson != null && !flightDataJson.isEmpty()) {
+            return ResponseEntity.ok(flightDataJson);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
 }
-
-
-
-
