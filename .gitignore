@@ -17,6 +17,9 @@ target/
 application-*.properties
 !application-dev.properties
 
+### Environment Variables ###
+.env
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
