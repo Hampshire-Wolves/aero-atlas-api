@@ -1,10 +1,15 @@
 package com.hampshirewolves.aeroatlasapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hampshirewolves.aeroatlasapi.service.AccessTokenManager;
 import com.hampshirewolves.aeroatlasapi.service.FlightDetailsService;
 import com.hampshirewolves.aeroatlasapi.service.FlightFetcher;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -12,10 +17,12 @@ import java.util.List;
 public class AeroAtlasApiApplication {
 
 	public static void main(String[] args) {
+		SpringApplication.run(AeroAtlasApiApplication.class, args);
+
 		String tokenUrl = "https://test.api.amadeus.com/v1/security/oauth2/token";
 		String flightOfferUrl = "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=LHR&destinationLocationCode=MAD&departureDate=2025-01-28&returnDate=2025-02-10&adults=1&max=1";
 
-		org.example.service.AccessTokenManager tokenManager = new org.example.service.AccessTokenManager();
+		AccessTokenManager tokenManager = new AccessTokenManager();
 		FlightFetcher flightFetcher = new FlightFetcher();
 		FlightDetailsService flightDetailsService = new FlightDetailsService();
 
@@ -42,4 +49,5 @@ public class AeroAtlasApiApplication {
 			e.printStackTrace();
 		}
 	}
+
 }

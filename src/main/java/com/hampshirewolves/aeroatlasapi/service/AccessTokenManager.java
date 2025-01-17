@@ -1,4 +1,4 @@
-package org.example.service;
+package com.hampshirewolves.aeroatlasapi.service;
 
 import org.example.dto.AccessTokenResponse;
 import org.springframework.http.*;
