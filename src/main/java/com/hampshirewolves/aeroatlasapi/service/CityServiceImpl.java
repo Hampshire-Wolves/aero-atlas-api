@@ -216,4 +216,19 @@ public class CityServiceImpl implements CityService {
                 && cityDTO.getIataCode() != null && cityDTO.getStarRating() != null
                 && cityDTO.getPriceRating() != null;
     }
+
+    @Override
+    public CityDTO getRandomCity() {
+        long count = cityRepository.count();
+
+        if (count == 0) {
+            throw new CityNotFoundException("No cities available in the database");
+        }
+
+        long randomId = (long) (Math.random() * count) + 1;
+        City randomCity = cityRepository.findById(randomId)
+                .orElseThrow(() -> new CityNotFoundException("City not found"));
+
+        return mapToDTO(randomCity);
+    }
 }
