@@ -48,13 +48,7 @@ public class CityController {
 
     @GetMapping("/random")
     public ResponseEntity<CityDTO> getRandomCity() {
-        CityDTO randomCity = cityService.getRandomCity();
-
-        if (randomCity == null) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return new ResponseEntity<>(randomCity, HttpStatus.OK);
+        return new ResponseEntity<>(cityService.getRandomCity(), HttpStatus.OK);
     }
 
 }

@@ -225,15 +225,4 @@ public class CityControllerTest {
                 .andExpect(jsonPath("$.starRating").value(String.valueOf(StarRating.FOUR)))
                 .andExpect(jsonPath("$.priceRating").value(String.valueOf(PriceRating.EXPENSIVE)));
     }
-
-    @Test
-    @DisplayName("GET /cities/random - should handle no cities available")
-    public void testGetRandomCityNoContent() throws Exception {
-        when(mockCityServiceImpl.getRandomCity()).thenReturn(null);
-
-        this.mockMvcController.perform(get("/cities/random"))
-                .andExpect(status().isNoContent());  // Expecting 204 No Content
-    }
-
-
 }
