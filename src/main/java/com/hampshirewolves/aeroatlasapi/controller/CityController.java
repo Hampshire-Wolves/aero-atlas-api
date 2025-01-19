@@ -1,6 +1,7 @@
 package com.hampshirewolves.aeroatlasapi.controller;
 
 import com.hampshirewolves.aeroatlasapi.dto.CityDTO;
+import com.hampshirewolves.aeroatlasapi.exception.CityNotFoundException;
 import com.hampshirewolves.aeroatlasapi.service.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,6 +49,12 @@ public class CityController {
     @GetMapping("/random")
     public ResponseEntity<CityDTO> getRandomCity() {
         CityDTO randomCity = cityService.getRandomCity();
+
+        if (randomCity == null) {
+            return ResponseEntity.noContent().build();
+        }
+
         return new ResponseEntity<>(randomCity, HttpStatus.OK);
     }
+
 }

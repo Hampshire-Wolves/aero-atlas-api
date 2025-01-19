@@ -225,10 +225,13 @@ public class CityServiceImpl implements CityService {
             throw new CityNotFoundException("No cities available in the database");
         }
 
-        long randomId = (long) (Math.random() * count) + 1;
-        City randomCity = cityRepository.findById(randomId)
-                .orElseThrow(() -> new CityNotFoundException("City not found"));
+        Iterable<City> citiesIterable = cityRepository.findAll();
+        List<City> cities = new ArrayList<>();
+        citiesIterable.forEach(cities::add);
+        long randomIndex = (long) (Math.random() * count);
+        City randomCity = cities.get((int) randomIndex);
 
         return mapToDTO(randomCity);
     }
+
 }

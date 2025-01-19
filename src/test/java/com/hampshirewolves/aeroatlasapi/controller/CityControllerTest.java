@@ -206,4 +206,34 @@ public class CityControllerTest {
             throw new RuntimeException(e);
         }
     }
+
+    @Test
+    @DisplayName("GET /cities/random - should return a random city")
+    public void testGetRandomCity() throws Exception {
+        when(mockCityServiceImpl.getRandomCity()).thenReturn(cityDTO);
+
+        this.mockMvcController.perform(get("/cities/random"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("London"))
+                .andExpect(jsonPath("$.description").value("test description"))
+                .andExpect(jsonPath("$.imageUrl").value("https://example.com/example.png"))
+                .andExpect(jsonPath("$.country").value("United Kingdom"))
+                .andExpect(jsonPath("$.lat").value(51.51))
+                .andExpect(jsonPath("$.lng").value(0.12))
+                .andExpect(jsonPath("$.iataCode").value("LON"))
+                .andExpect(jsonPath("$.starRating").value(String.valueOf(StarRating.FOUR)))
+                .andExpect(jsonPath("$.priceRating").value(String.valueOf(PriceRating.EXPENSIVE)));
+    }
+
+    @Test
+    @DisplayName("GET /cities/random - should handle no cities available")
+    public void testGetRandomCityNoContent() throws Exception {
+        when(mockCityServiceImpl.getRandomCity()).thenReturn(null);
+
+        this.mockMvcController.perform(get("/cities/random"))
+                .andExpect(status().isNoContent());  // Expecting 204 No Content
+    }
+
+
 }

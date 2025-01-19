@@ -326,4 +326,33 @@ public class CityServiceImplTest {
         assertThat(result).hasFieldOrPropertyWithValue("name", "Big Ben");
         assertThat(result).hasFieldOrPropertyWithValue("imageUrl", "https://example.com/example.png");
     }
+
+    @Test
+    @DisplayName("getRandomCity: should return a random city when cities are available")
+    public void testGetRandomCitySuccess() {
+        when(mockCityRepository.count()).thenReturn(5L); // Assume there are 5 cities
+        when(mockCityRepository.findAll()).thenReturn(List.of(
+                city,
+                City.builder().name("Berlin").build(),
+                City.builder().name("Paris").build(),
+                City.builder().name("New York").build(),
+                City.builder().name("Tokyo").build()
+        ));
+
+        CityDTO randomCityDTO = cityServiceImpl.getRandomCity();
+
+        assertThat(randomCityDTO).isNotNull();
+        assertThat(randomCityDTO.getName()).isIn("London", "Berlin", "Paris", "New York", "Tokyo");
+    }
+
+    @Test
+    @DisplayName("getRandomCity: should throw CityNotFoundException when no cities are available")
+    public void testGetRandomCityNoCitiesAvailable() {
+        when(mockCityRepository.count()).thenReturn(0L);
+
+        assertThrows(CityNotFoundException.class, () -> cityServiceImpl.getRandomCity());
+
+        verify(mockCityRepository, times(1)).count();
+        verify(mockCityRepository, never()).findAll();
+    }
 }
